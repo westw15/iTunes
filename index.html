@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>iTunes API Tutorial</title>
+    <link rel="shortcut icon" href="http://findicons.com/files/icons/2770/ios_7_icons/512/music.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+
+<body>
+    <div class="parallax-container">
+        <div class="parallax">
+            <img src="west.jpg">
+        </div>
+    </div>
+    <nav>
+        <div class="nav-wrapper pink lighten-4">
+            <form>
+                <div class="input-field">
+                    <input id="search" type="search" required>
+                    <label class="label-icon" for="search">
+                        <i class="material-icons">search</i>
+                    </label>
+                    <i class="material-icons">close</i>
+                </div>
+            </form>
+        </div>
+    </nav>
+    <div class="container">
+        <h1>West's iTunes API</h1>
+        <h3>
+            Listen Up Below!
+        </h3>
+        <ul id="songs" class="collapsible">
+
+        </ul>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.js"></script>
+    <script>
+        $("form").submit(function (e) {
+            e.preventDefault()
+            searchItunes($("#search").val())
+        })
+        function searchItunes(query) {
+            $("#songs").html("")
+            $.ajax({
+                url: "https://itunes.apple.com/search?term=" + query,
+                dataType: 'JSONP'
+            })
+                .done(function (data) {
+                    console.log(data);
+                    // add code for when response from apple comes back.
+                    for (var i = 0; i < data.results.length; i++) {
+                        if (data.results[i].trackName) {
+                            $('#songs').append(`
+                            <li>
+                                <div class="collapsible-header"><i class="material-icons">filter_drama</i> ${data.results[i].trackName}</div>
+                                <div class="collapsible-body">
+                                <img src = "${data.results[i].artworkUrl100}">
+                                <span>Album: ${data.results[i].collectionName}</span><br>
+                                <audio controls>
+                                                <source src="${data.results[i].previewUrl}" type="audio/mp4">
+                                            </audio>
+                                            </div>
+                            </li>`);
+                        }
+                    }
+                    $('.collapsible').collapsible();
+                    $('html, body').animate({
+                    scrollTop: $("#search").offset().top
+                }, 1000);
+                })
+                .fail(function (data) {
+                    console.log(data);
+                    $('#songs').append(data.status);
+                })
+        }
+
+
+
+
+        $(document).ready(function () {
+            $('.parallax').parallax();
+        });
+    </script>
+</body>
+
+</html>
